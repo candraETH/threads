@@ -53,6 +53,7 @@ export default function FollowModal() {
               href="https://www.threads.com/@can_lotte"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => setIsOpen(false)}
               className="group relative inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-4 font-bold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:from-emerald-400 hover:to-teal-500 hover:shadow-emerald-500/40 hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg
