@@ -1,39 +1,23 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-
-const STORAGE_KEY = "taksir_follow_dismissed";
+import { useEffect, useState } from "react";
 
 export default function FollowModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [dontShow, setDontShow] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const dismissed = localStorage.getItem(STORAGE_KEY);
-    if (!dismissed) {
-      const timer = setTimeout(() => setIsOpen(true), 1500);
-      return () => clearTimeout(timer);
-    }
+    const timer = setTimeout(() => setIsOpen(true), 1500);
+    return () => clearTimeout(timer);
   }, []);
-
-  const handleClose = useCallback(() => {
-    if (dontShow) {
-      localStorage.setItem(STORAGE_KEY, "1");
-    }
-    setIsOpen(false);
-  }, [dontShow]);
 
   if (!mounted || !isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      onClick={handleClose}
-    >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop - no click to close */}
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-fade-in" />
 
       {/* Modal */}
       <div
@@ -70,7 +54,6 @@ export default function FollowModal() {
               href="https://www.threads.com/@can_lotte"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={handleClose}
               className="group relative inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-4 font-bold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:from-emerald-400 hover:to-teal-500 hover:shadow-emerald-500/40 hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg
@@ -82,28 +65,6 @@ export default function FollowModal() {
               </svg>
               Follow @can_lotte
             </a>
-
-            {/* Dismiss */}
-            <div className="space-y-3">
-              <label className="flex items-center justify-center gap-2 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={dontShow}
-                  onChange={(e) => setDontShow(e.target.checked)}
-                  className="h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-0 cursor-pointer"
-                />
-                <span className="text-xs text-zinc-500 group-hover:text-zinc-400 transition-colors">
-                  Jangan tampilkan lagi
-                </span>
-              </label>
-
-              <button
-                onClick={handleClose}
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm font-medium text-zinc-400 transition-all duration-300 hover:bg-zinc-800 hover:text-zinc-300 hover:border-zinc-700"
-              >
-                Nanti Saja
-              </button>
-            </div>
           </div>
         </div>
       </div>
