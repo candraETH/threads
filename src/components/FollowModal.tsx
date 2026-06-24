@@ -21,7 +21,23 @@ export default function FollowModal() {
     setIsOpen(false);
   };
 
-  if (!mounted || !isOpen) return null;
+  const handleReset = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setIsOpen(true);
+  };
+
+  if (!mounted) return null;
+
+  if (!isOpen) {
+    return (
+      <button
+        onClick={handleReset}
+        className="fixed bottom-4 right-4 z-50 rounded-lg bg-zinc-800 px-3 py-2 text-[10px] text-zinc-500 opacity-30 hover:opacity-100 transition-opacity"
+      >
+        Reset Modal
+      </button>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
