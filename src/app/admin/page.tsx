@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const ADMIN_USER = "pengelola";
 const ADMIN_PASS = "987654321";
 const AUTH_KEY = "taksir_admin_auth";
+const USERS_KEY = "taksir_users";
+
+interface TrackedUser {
+  username: string;
+  time: string;
+}
 
 export default function AdminPage() {
   const [isAuthed, setIsAuthed] = useState(() => {
@@ -15,6 +21,16 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [users, setUsers] = useState<TrackedUser[]>([]);
+
+  useEffect(() => {
+    if (isAuthed) {
+      try {
+        const raw = localStorage.getItem(USERS_KEY);
+        if (raw) setUsers(JSON.parse(raw));
+      } catch {}
+    }
+  }, [isAuthed]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,19 +158,53 @@ export default function AdminPage() {
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 text-center space-y-2">
-              <p className="text-3xl font-black text-emerald-400">—</p>
+              <p className="text-3xl font-black text-emerald-400">{users.length}</p>
               <p className="text-xs text-zinc-500 uppercase tracking-wider">Total Taksir</p>
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 text-center space-y-2">
-              <p className="text-3xl font-black text-emerald-400">—</p>
+              <p className="text-3xl font-black text-emerald-400">
+                {users.filter((u) => {
+                  const d = new Date(u.time);
+                  const now = new Date();
+                  return d.toDateString() === now.toDateString();
+                }).length}
+              </p>
               <p className="text-xs text-zinc-500 uppercase tracking-wider">Pengguna Hari Ini</p>
             </div>
           </div>
 
-          {/* Placeholder */}
-          <div className="rounded-2xl border border-dashed border-zinc-800 p-12 text-center space-y-3">
-            <p className="text-zinc-600 text-sm">Fitur admin akan segera hadir.</p>
-            <p className="text-zinc-700 text-xs">Analytics, user management, dan lainnya.</p>
+          {/* User List */}
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 overflow-hidden">
+            <div className="px-6 py-4 border-b border-zinc-800 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Daftar Pengguna</h3>
+              <span className="text-xs text-zinc-500">{users.length} akun</span>
+            </div>
+            {users.length === 0 ? (
+              <div className="p-12 text-center">
+                <p className="text-zinc-600 text-sm">Belum ada pengguna.</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-zinc-800/50 max-h-[400px] overflow-y-auto">
+                {users.map((u, i) => (
+                  <div key={i} className="px-6 py-3 flex items-center justify-between hover:bg-zinc-800/30 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold">
+                        {u.username.replace("@", "").charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-sm text-white font-medium">{u.username}</span>
+                    </div>
+                    <span className="text-xs text-zinc-500">
+                      {new Date(u.time).toLocaleString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </main>

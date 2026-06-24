@@ -7,12 +7,24 @@ import LoadingAnimation from "@/components/LoadingAnimation";
 import FollowModal from "@/components/FollowModal";
 import type { TaksirInput, TaksirResult } from "@/types";
 
+const USERS_KEY = "taksir_users";
+
+function trackUser(username: string) {
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    const users: { username: string; time: string }[] = raw ? JSON.parse(raw) : [];
+    users.unshift({ username, time: new Date().toISOString() });
+    localStorage.setItem(USERS_KEY, JSON.stringify(users.slice(0, 100)));
+  } catch {}
+}
+
 export default function Home() {
   const [result, setResult] = useState<TaksirResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async (input: TaksirInput) => {
+    trackUser(input.username);
     setIsLoading(true);
     setError(null);
     setResult(null);
