@@ -2,42 +2,16 @@
 
 import { useEffect, useState } from "react";
 
-const STORAGE_KEY = "taksir_follow_done";
-
 export default function FollowModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const done = localStorage.getItem(STORAGE_KEY);
-    if (!done) {
-      setIsOpen(true);
-    }
+    setIsOpen(true);
   }, []);
 
-  const handleFollow = () => {
-    localStorage.setItem(STORAGE_KEY, "1");
-    setIsOpen(false);
-  };
-
-  const handleReset = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setIsOpen(true);
-  };
-
-  if (!mounted) return null;
-
-  if (!isOpen) {
-    return (
-      <button
-        onClick={handleReset}
-        className="fixed bottom-4 right-4 z-50 rounded-lg bg-zinc-800 px-3 py-2 text-[10px] text-zinc-500 opacity-30 hover:opacity-100 transition-opacity"
-      >
-        Reset Modal
-      </button>
-    );
-  }
+  if (!mounted || !isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -79,7 +53,6 @@ export default function FollowModal() {
               href="https://www.threads.com/@can_lotte"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={handleFollow}
               className="group relative inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-4 font-bold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:from-emerald-400 hover:to-teal-500 hover:shadow-emerald-500/40 hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg
