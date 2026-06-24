@@ -4,6 +4,7 @@ import { useState } from "react";
 import TaksirForm from "@/components/TaksirForm";
 import BrosurCard from "@/components/BrosurCard";
 import LoadingAnimation from "@/components/LoadingAnimation";
+import FollowModal from "@/components/FollowModal";
 import type { TaksirInput, TaksirResult } from "@/types";
 
 export default function Home() {
@@ -45,6 +46,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-zinc-950 flex flex-col">
+      <FollowModal />
       {/* Header */}
       <header className="w-full py-6 px-4">
         <div className="max-w-md mx-auto flex items-center justify-center gap-2">
