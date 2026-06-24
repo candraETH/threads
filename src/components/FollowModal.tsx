@@ -12,8 +12,7 @@ export default function FollowModal() {
     setMounted(true);
     const done = localStorage.getItem(STORAGE_KEY);
     if (!done) {
-      const timer = setTimeout(() => setIsOpen(true), 1500);
-      return () => clearTimeout(timer);
+      setIsOpen(true);
     }
   }, []);
 
