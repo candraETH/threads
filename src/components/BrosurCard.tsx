@@ -247,6 +247,12 @@ function getGradeColor(grade: string): string {
   return "text-rose-400";
 }
 
+async function dataUrlToFile(dataUrl: string, filename: string) {
+  const response = await fetch(dataUrl);
+  const blob = await response.blob();
+  return new File([blob], filename, { type: "image/png" });
+}
+
 function MetricTile({
   icon,
   label,
@@ -336,15 +342,38 @@ export default function BrosurCard({ result, onReset }: BrosurCardProps) {
   const handleDownload = async () => {
     if (!cardRef.current) return;
     try {
+      const filename = `taksir-akun-${result.username.replace("@", "")}.png`;
       const dataUrl = await toPng(cardRef.current, {
         quality: 1,
         pixelRatio: 2,
         backgroundColor: "#020617",
+        cacheBust: true,
       });
+
+      const file = await dataUrlToFile(dataUrl, filename);
+      const canShareFile =
+        typeof navigator !== "undefined" &&
+        "share" in navigator &&
+        "canShare" in navigator &&
+        navigator.canShare({ files: [file] });
+
+      if (canShareFile) {
+        await navigator.share({
+          files: [file],
+          title: "Taksir Akun Threads",
+          text: "Hasil taksir akun Threads",
+        });
+        return;
+      }
+
       const link = document.createElement("a");
-      link.download = `taksir-akun-${result.username.replace("@", "")}.png`;
-      link.href = dataUrl;
+      const objectUrl = URL.createObjectURL(file);
+      link.download = filename;
+      link.href = objectUrl;
+      document.body.appendChild(link);
       link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
     } catch (err) {
       console.error("Download failed:", err);
     }
