@@ -315,6 +315,8 @@ export default function BrosurCard({ result, onReset }: BrosurCardProps) {
   const profile = result.scraped_profile;
   const [scale, setScale] = useState(1);
   const [cardHeight, setCardHeight] = useState(0);
+  const [showDownloadPrompt, setShowDownloadPrompt] = useState(false);
+  const [shareStatus, setShareStatus] = useState("");
 
   useEffect(() => {
     const updateCardFrame = () => {
@@ -339,7 +341,7 @@ export default function BrosurCard({ result, onReset }: BrosurCardProps) {
     };
   }, [result]);
 
-  const handleDownload = async () => {
+  const downloadPng = async () => {
     if (!cardRef.current) return;
     try {
       const filename = `taksir-akun-${result.username.replace("@", "")}.png`;
@@ -376,6 +378,38 @@ export default function BrosurCard({ result, onReset }: BrosurCardProps) {
       URL.revokeObjectURL(objectUrl);
     } catch (err) {
       console.error("Download failed:", err);
+    }
+  };
+
+  const handleDownload = () => {
+    setShowDownloadPrompt(true);
+  };
+
+  const handleContinueDownload = () => {
+    setShowDownloadPrompt(false);
+    void downloadPng();
+  };
+
+  const handleShare = async () => {
+    const shareUrl = typeof window === "undefined" ? "https://www.threads.com/@can_lotte" : window.location.href;
+    const shareText = `Cek hasil taksir akun Threads ${result.username}.`;
+    const browserNavigator = typeof window === "undefined" ? undefined : window.navigator;
+
+    try {
+      if (browserNavigator?.share) {
+        await browserNavigator.share({
+          title: "Taksir Akun Threads",
+          text: shareText,
+          url: shareUrl,
+        });
+        return;
+      }
+
+      await browserNavigator?.clipboard?.writeText(`${shareText} ${shareUrl}`);
+      setShareStatus("Link berhasil disalin.");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      setShareStatus("Share belum tersedia di browser ini.");
     }
   };
 
@@ -535,6 +569,70 @@ export default function BrosurCard({ result, onReset }: BrosurCardProps) {
           Lagi
         </button>
       </div>
+
+      {showDownloadPrompt && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-emerald-500/35 bg-zinc-950 shadow-2xl shadow-emerald-500/20">
+            <div className="h-1 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500" />
+            <div className="space-y-5 p-6 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/10">
+                <ThreadsLogo className="h-8 w-8" />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-white">Dukung Developer</h3>
+                <p className="text-sm leading-relaxed text-zinc-400">
+                  Sebelum mengunduh hasil PNG, Anda dapat mendukung pengembangan tools ini dengan mengikuti akun Threads developer.
+                </p>
+              </div>
+
+              <a
+                href="https://www.threads.com/@can_lotte"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-3 font-bold text-white shadow-lg shadow-emerald-500/25 transition-all hover:from-emerald-400 hover:to-teal-500"
+              >
+                <ThreadsLogo className="h-5 w-5" />
+                <span>Follow @can_lotte</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={handleShare}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-sky-500/35 bg-sky-500/10 px-4 py-3 font-bold text-sky-300 transition-all hover:bg-sky-500/20"
+              >
+                <Icon name="globe" className="h-5 w-5" />
+                <span>Share ke Medsos</span>
+              </button>
+
+              {shareStatus && (
+                <p className="text-xs font-medium text-emerald-300">{shareStatus}</p>
+              )}
+
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowDownloadPrompt(false)}
+                  className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm font-bold text-zinc-300 transition-all hover:bg-zinc-800"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleContinueDownload}
+                  className="rounded-xl border border-emerald-500/35 bg-emerald-500/10 px-4 py-3 text-sm font-bold text-emerald-300 transition-all hover:bg-emerald-500/20"
+                >
+                  Lanjut Download
+                </button>
+              </div>
+
+              <p className="text-xs leading-relaxed text-zinc-600">
+                Opsional, tidak wajib. Terima kasih sudah menggunakan Taksir Threads.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
