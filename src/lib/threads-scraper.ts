@@ -17,6 +17,7 @@ export interface ThreadsProfileScores {
   score_branding: number;
   score_trust: number;
   score_cuan: number;
+  score_asbun: number;
 }
 
 export function estimateAvgViews(profile: ThreadsProfileData): number | undefined {
@@ -120,11 +121,32 @@ function scoreTrust(profile: ThreadsProfileData): number {
   return clampScore(score);
 }
 
+function scoreAsbun(profile: ThreadsProfileData): number {
+  const followers = profile.followers || 0;
+  const threadCount = profile.threadCount || 0;
+  const bio = profile.bio?.trim() || "";
+  const vagueBio = /random|gabut|opini|curhat|apa aja|suka suka|semua|cerita|daily|hidup|pemikir/i.test(bio);
+
+  let score = 18;
+  if (threadCount >= 10) score += 12;
+  if (threadCount >= 50) score += 12;
+  if (threadCount >= 150) score += 12;
+  if (followers > 0 && followers < 500) score += 8;
+  if (followers >= 500 && followers < 5_000) score += 5;
+  if (bio.length > 0 && bio.length < 35) score += 8;
+  if (vagueBio) score += 15;
+  if (!bio) score += 10;
+  if ((profile.avgViews || 0) > followers * 5) score += 8;
+
+  return clampScore(score);
+}
+
 export function calculateThreadsScores(profile: ThreadsProfileData): ThreadsProfileScores {
   const score_followers = scoreFollowers(profile.followers);
   const score_engagement = scoreEngagementProxy(profile.followers, profile.threadCount, profile.avgViews);
   const score_branding = scoreBranding(profile);
   const score_trust = scoreTrust(profile);
+  const score_asbun = scoreAsbun(profile);
   const score_cuan = clampScore(
     score_followers * 0.3 +
     score_engagement * 0.3 +
@@ -138,6 +160,7 @@ export function calculateThreadsScores(profile: ThreadsProfileData): ThreadsProf
     score_branding,
     score_trust,
     score_cuan,
+    score_asbun,
   };
 }
 

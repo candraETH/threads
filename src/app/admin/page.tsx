@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 const ADMIN_USER = "pengelola";
 const ADMIN_PASS = "987654321";
 const AUTH_KEY = "taksir_admin_auth";
-const USERS_KEY = "taksir_users";
 
 interface TrackedUser {
   username: string;
@@ -25,10 +24,12 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (isAuthed) {
-      try {
-        const raw = localStorage.getItem(USERS_KEY);
-        if (raw) setUsers(JSON.parse(raw));
-      } catch {}
+      fetch("/api/track")
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data.users)) setUsers(data.users);
+        })
+        .catch(() => setUsers([]));
     }
   }, [isAuthed]);
 

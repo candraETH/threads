@@ -10,6 +10,7 @@ const LOADING_TEXTS = [
 ];
 
 import { useEffect, useState } from "react";
+import FollowModal from "@/components/FollowModal";
 
 export default function LoadingAnimation() {
   const [currentText, setCurrentText] = useState(0);
@@ -22,7 +23,9 @@ export default function LoadingAnimation() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center gap-6 py-12">
+    <div className="flex w-full flex-col items-center gap-6 py-12">
+      <FollowModal />
+
       <p className="max-w-xs text-center text-sm font-medium text-zinc-400 sm:text-base">
         Agar tidak bosan menunggu, anda bisa menatap kanda ganteng!!
       </p>

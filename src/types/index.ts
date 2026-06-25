@@ -28,6 +28,7 @@ export interface TaksirResult {
   score_branding: number;
   score_trust: number;
   score_cuan: number;
+  score_asbun: number;
   price_boosters: string[];
   price_penalties: string[];
   ai_comment: string;

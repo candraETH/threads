@@ -27,7 +27,8 @@ type IconName =
   | "info"
   | "heart"
   | "star"
-  | "shield";
+  | "shield"
+  | "mic";
 
 function ThreadsLogo({ className = "h-10 w-10" }: { className?: string }) {
   return (
@@ -140,6 +141,13 @@ function Icon({ name, className = "h-5 w-5" }: { name: IconName; className?: str
     ),
     star: <path d="m12 2 3 6 6.6 1-4.8 4.6 1.1 6.5L12 17l-5.9 3.1 1.1-6.5L2.4 9 9 8Z" />,
     shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />,
+    mic: (
+      <>
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+        <path d="M12 19v3" />
+      </>
+    ),
   };
 
   return <svg {...common}>{paths[name]}</svg>;
@@ -173,7 +181,7 @@ function ScoreBar({
   label: string;
   score: number;
   icon: IconName;
-  tone: "emerald" | "rose" | "amber" | "sky" | "violet";
+  tone: "emerald" | "rose" | "amber" | "sky" | "violet" | "orange";
 }) {
   const filled = Math.max(0, Math.min(10, Math.round(score / 10)));
   const active =
@@ -181,6 +189,8 @@ function ScoreBar({
       ? "bg-emerald-400 shadow-emerald-400/40"
       : tone === "rose"
         ? "bg-rose-400 shadow-rose-400/40"
+        : tone === "orange"
+          ? "bg-orange-400 shadow-orange-400/40"
         : tone === "sky"
           ? "bg-sky-400 shadow-sky-400/40"
           : tone === "violet"
@@ -191,6 +201,8 @@ function ScoreBar({
       ? "text-emerald-400"
       : tone === "rose"
         ? "text-rose-400"
+        : tone === "orange"
+          ? "text-orange-400"
         : tone === "sky"
           ? "text-sky-400"
           : tone === "violet"
@@ -340,6 +352,21 @@ export default function BrosurCard({ result, onReset }: BrosurCardProps) {
 
   return (
     <div className="w-full max-w-[740px] space-y-4">
+      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-center shadow-lg shadow-emerald-500/10">
+        <p className="text-sm leading-relaxed text-zinc-300">
+          Hasil taksir ini cuma untuk hiburan, bukan harga resmi dan bukan patokan jual beli sungguhan.
+        </p>
+        <a
+          href="https://www.threads.com/@can_lotte"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-500/35 bg-black/30 px-4 py-2 font-bold text-emerald-300 transition-all hover:border-emerald-400/60 hover:bg-emerald-500/10 hover:text-emerald-200"
+        >
+          <ThreadsLogo className="h-5 w-5" />
+          <span>Follow @can_lotte</span>
+        </a>
+      </div>
+
       <div
         ref={viewportRef}
         className="mx-auto flex w-full justify-center overflow-hidden"
@@ -436,6 +463,7 @@ export default function BrosurCard({ result, onReset }: BrosurCardProps) {
                 <ScoreBar label="Branding" score={result.score_branding} icon="star" tone="amber" />
                 <ScoreBar label="Trust" score={result.score_trust} icon="shield" tone="sky" />
                 <ScoreBar label="Potensi" score={result.score_cuan} icon="rocket" tone="violet" />
+                <ScoreBar label="Asbun" score={result.score_asbun} icon="mic" tone="orange" />
               </div>
 
               <div className="grid grid-cols-2 gap-5">

@@ -4,17 +4,15 @@ import { useState } from "react";
 import TaksirForm from "@/components/TaksirForm";
 import BrosurCard from "@/components/BrosurCard";
 import LoadingAnimation from "@/components/LoadingAnimation";
-import FollowModal from "@/components/FollowModal";
 import type { TaksirInput, TaksirResult } from "@/types";
 
-const USERS_KEY = "taksir_users";
-
-function trackUser(username: string) {
+async function trackUser(username: string) {
   try {
-    const raw = localStorage.getItem(USERS_KEY);
-    const users: { username: string; time: string }[] = raw ? JSON.parse(raw) : [];
-    users.unshift({ username, time: new Date().toISOString() });
-    localStorage.setItem(USERS_KEY, JSON.stringify(users.slice(0, 100)));
+    await fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username }),
+    });
   } catch {}
 }
 
@@ -24,7 +22,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async (input: TaksirInput) => {
-    trackUser(input.username);
+    void trackUser(input.username);
     setIsLoading(true);
     setError(null);
     setResult(null);
@@ -58,7 +56,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-zinc-950 flex flex-col">
-      <FollowModal />
       {/* Header */}
       <header className="w-full py-6 px-4">
         <div className="max-w-md mx-auto flex items-center justify-center gap-2">
