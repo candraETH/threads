@@ -1,12 +1,13 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
+import { getRuntimeDataDir } from "@/lib/runtime-data";
 
 export interface TrackedUser {
   username: string;
   time: string;
 }
 
-const DATA_DIR = path.join(process.cwd(), "data");
+const DATA_DIR = getRuntimeDataDir();
 const DATA_FILE = path.join(DATA_DIR, "tracked-users.json");
 const MAX_USERS = 500;
 
@@ -64,8 +65,12 @@ export async function addTrackedUser(username: string) {
     ...users.filter((user) => getUserKey(user.username) !== key),
   ].slice(0, MAX_USERS);
 
-  await mkdir(DATA_DIR, { recursive: true });
-  await writeFile(DATA_FILE, JSON.stringify(nextUsers, null, 2), "utf8");
+  try {
+    await mkdir(DATA_DIR, { recursive: true });
+    await writeFile(DATA_FILE, JSON.stringify(nextUsers, null, 2), "utf8");
+  } catch (error) {
+    console.error("Failed to save tracked user:", error);
+  }
 
   return nextUsers[0];
 }

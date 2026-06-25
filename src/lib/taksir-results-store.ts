@@ -1,8 +1,9 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
+import { getRuntimeDataDir } from "@/lib/runtime-data";
 import type { TaksirResult } from "@/types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+const DATA_DIR = getRuntimeDataDir();
 const DATA_FILE = path.join(DATA_DIR, "taksir-results.json");
 
 type StoredResults = Record<string, TaksirResult>;
@@ -42,6 +43,10 @@ export async function saveStoredResult(result: TaksirResult) {
   const results = await readResults();
   results[key] = result;
 
-  await mkdir(DATA_DIR, { recursive: true });
-  await writeFile(DATA_FILE, JSON.stringify(results, null, 2), "utf8");
+  try {
+    await mkdir(DATA_DIR, { recursive: true });
+    await writeFile(DATA_FILE, JSON.stringify(results, null, 2), "utf8");
+  } catch (error) {
+    console.error("Failed to save taksir result:", error);
+  }
 }
