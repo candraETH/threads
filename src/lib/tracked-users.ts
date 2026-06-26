@@ -9,7 +9,6 @@ export interface TrackedUser {
 
 const DATA_DIR = getRuntimeDataDir();
 const DATA_FILE = path.join(DATA_DIR, "tracked-users.json");
-const MAX_USERS = 500;
 
 function cleanUsername(username: string) {
   const cleaned = username.trim();
@@ -63,7 +62,7 @@ export async function addTrackedUser(username: string) {
   const nextUsers = [
     { username: cleaned, time: new Date().toISOString() },
     ...users.filter((user) => getUserKey(user.username) !== key),
-  ].slice(0, MAX_USERS);
+  ];
 
   try {
     await mkdir(DATA_DIR, { recursive: true });
